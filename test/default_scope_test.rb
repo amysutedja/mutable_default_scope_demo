@@ -18,13 +18,25 @@ class DefaultScopeTest < ActiveSupport::TestCase
     @book2.save!
   end
 
-  test 'default_scope' do
+  teardown do
+    Thread.current[:test] = nil
+  end
+
+  test 'default_scope generates wrong sql when clause changes' do
     u = User.first
 
-    puts Book.where(id: u.books).to_sql
+    books = Book.where(id: u.books)
+
+    puts "Correct SQL: #{books.to_sql}"
+
+    assert_equal(books.count, 2)
 
     Thread.current[:test] = true
 
-    puts Book.where(id: u.books).to_sql
+    books = Book.where(id: u.books)
+
+    puts "Invalid SQL: #{books.to_sql}"
+
+    assert_equal(books.count, 2)
   end
 end

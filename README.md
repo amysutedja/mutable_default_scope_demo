@@ -1,24 +1,22 @@
-# README
+# Mutable Default Scope Bug Demo
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+This repo demonstrates an issue in Rails 4.2.3+ and 5.0+ in which incorrect SQL is generated under the following scenario.
 
-Things you may want to cover:
+1. A model M has many of child model C.
+2. C has a `default_scope` defined which is conditional -- for example, it might return different clauses based on thread-local storage.
+3. One condition returns all records, and the other returns a where filter based on a boolean.
+4. The child model C is used in a subquery, such as `C.where(id: m_instance.cs)`.
+5. A thread exercises both conditions.
 
-* Ruby version
+If all of these hold, the generated SQL for the full query when the second condition runs becomes invalid.
 
-* System dependencies
+```
+Correct SQL: SELECT "books".* FROM "books" WHERE "books"."deleted" = 'f' AND "books"."id" IN (SELECT "books"."id" FROM "books" WHERE "books"."deleted" = 'f' AND "books"."user_id" = 1)
+Invalid SQL: SELECT "books".* FROM "books" WHERE "books"."id" IN (SELECT "books"."id" FROM "books" WHERE "books"."user_id" = 'f')
+```
 
-* Configuration
+To exercise the test case for this:
 
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+```
+bin/rake
+```
