@@ -1,5 +1,7 @@
 # Mutable Default Scope Bug Demo
 
+_This issue is fixed as of Rails 5.0.3._
+
 This repo demonstrates an issue in Rails 4.2.3+ and 5.0+ in which incorrect SQL is generated under the following scenario.
 
 1. A model M has many of child model C.
