@@ -35,7 +35,7 @@ class DefaultScopeTest < ActiveSupport::TestCase
 
     books = Book.where(id: u.books)
 
-    puts "Invalid SQL: #{books.to_sql}"
+    puts "Potentially Invalid SQL: #{books.to_sql}"
 
     assert_equal(books.count, 2)
   end
